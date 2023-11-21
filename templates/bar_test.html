@@ -52,7 +52,7 @@
     function fetchData() {
         $.ajax({
             type: "GET",
-            url: "/barChart",
+            url: "/bar_test_data",
             dataType: "json",
             success: function (result) {
                 chart.setOption(JSON.parse(result));
@@ -63,7 +63,7 @@
     function fetchData2() {
         $.ajax({
             type: "GET",
-            url: "/barChart",
+            url: "/bar_test_data",
             dataType: "json",
             success: function (result) {
                 chart2.setOption(JSON.parse(result));
