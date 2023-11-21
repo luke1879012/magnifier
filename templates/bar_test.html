@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <script src="https://cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 将容器分成两列 */
+            grid-template-rows: 1fr 1fr; /* 将容器分成两行 */
+            height: 100%; /* 网格占满整个父容器的高度 */
+            width: 100%; /* 网格占满整个父容器的宽度 */
+        }
+
+        .grid-item {
+            display: flex;
+            justify-content: center; /* 水平居中内容 */
+            align-items: center; /* 垂直居中内容 */
+            /*border: 1px solid #000; !* 边框 *!*/
+        }
+    </style>
+</head>
+<body>
+<div class="grid-container">
+    <div id="bar" class="grid-item">左上区域</div>
+    <div id="bar2" class="grid-item"></div>
+    <div class="grid-item">3</div>
+    <div class="grid-item">4</div>
+</div>
+<!--<div id="bar" style="width:50%; height:450px;"></div>-->
+<!--<div id="bar2" style="width:50%; height:450px;"></div>-->
+<script>
+    var chart = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});
+    var chart2 = echarts.init(document.getElementById('bar2'), 'white', {renderer: 'canvas'});
+    $(
+        function () {
+            fetchData();
+            fetchData2();
+            setInterval(fetchData, 2000);
+            setInterval(fetchData2, 2000);
+        }
+    );
+
+    function fetchData() {
+        $.ajax({
+            type: "GET",
+            url: "/barChart",
+            dataType: "json",
+            success: function (result) {
+                chart.setOption(JSON.parse(result));
+            }
+        });
+    };
+
+    function fetchData2() {
+        $.ajax({
+            type: "GET",
+            url: "/barChart",
+            dataType: "json",
+            success: function (result) {
+                chart2.setOption(JSON.parse(result));
+            }
+        });
+    }
+</script>
+</body>
+</html>
