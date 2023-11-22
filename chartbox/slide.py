@@ -16,7 +16,7 @@ from utils.database import get_db
 def slide_cnt():
     db = get_db()
     with db.cursor() as cursor:
-        cursor.execute("""select crt_time, count from slide_count order by crt_time desc limit 1440;""")
+        cursor.execute("""select crt_time, count from slide_count order by crt_time desc limit 480;""")
         data = cursor.fetchall()
         data = reversed(data)
         x_data = []
