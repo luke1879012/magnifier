@@ -7,6 +7,7 @@ from chartbox.slide import slide_cnt
 app = Sanic(__name__)
 
 app.static("/", "./templates/index.html", name="index")
+app.static("/static", "./static", name="static_data")
 app.static("/bar_test", "./templates/bar_test.html", name="bar_test")
 app.static("/slide", "./templates/slide.html", name="slide")
 
