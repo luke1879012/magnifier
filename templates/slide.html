@@ -15,8 +15,8 @@
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr; /* 将容器分成两列 */
-            grid-template-rows: 1fr 1fr; /* 将容器分成两行 */
-            height: 100%; /* 网格占满整个父容器的高度 */
+            /*grid-template-rows: 1fr 1fr; !* 将容器分成两行 *!*/
+            height: 50%; /* 网格占满整个父容器的高度 */
             width: 100%; /* 网格占满整个父容器的宽度 */
         }
 
@@ -32,9 +32,8 @@
 <div class="grid-container">
     <div id="slide1" class="grid-item">1</div>
     <div id="bidp2" class="grid-item">2</div>
-    <div id="login_status3" class="grid-item">3</div>
-    <div id="slide4" class="grid-item">4</div>
 </div>
+<div id="login_status3" style="height: 48%; width: 98%;">3</div>
 
 <script>
     var chart1 = echarts.init(document.getElementById('slide1'), 'white', {renderer: 'canvas'});
