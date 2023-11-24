@@ -32,7 +32,7 @@
 <div class="grid-container">
     <div id="slide1" class="grid-item">1</div>
     <div id="bidp2" class="grid-item">2</div>
-    <div id="slide3" class="grid-item">3</div>
+    <div id="login_status3" class="grid-item">3</div>
     <div id="slide4" class="grid-item">4</div>
 </div>
 
@@ -42,12 +42,15 @@
     var last_bidp_time = '';
     var bidp_old_data = [];
     var bidp_len = 0;
+    var chart3 = echarts.init(document.getElementById('login_status3'), 'white', {renderer: 'canvas'});
     $(
         function () {
             fetchData();
             fetchDataBidpAll();
+            fetchDataLoginStatus();
             setInterval(fetchData, 1000 * 60 * 2);  // 2分钟刷新
             setInterval(fetchDataBidpUpdate, 1000 * 2);
+            setInterval(fetchDataLoginStatus, 1000 * 2.8);
         }
     );
 
@@ -83,7 +86,7 @@
             dataType: "json",
             data: {last_time: last_bidp_time},
             success: function (result) {
-                console.log(result);
+                // console.log(result);
                 if (result.length === 0) {
                     return;
                 }
@@ -116,6 +119,28 @@
             }
         });
     };
+
+    function fetchDataLoginStatus() {
+        $.ajax({
+            type: "GET",
+            url: "/login_status_data",
+            dataType: "json",
+            success: function (result) {
+                j_data = JSON.parse(result);
+                console.log(j_data);
+                console.log(j_data['tooltip']['formatter']);
+                eval("j_data['tooltip']['formatter'] = " + j_data['tooltip']['formatter'])
+                j_data['series'].forEach(function (item) {
+                    if (item.hasOwnProperty('label') && item.label.hasOwnProperty('formatter')) {
+                        console.log(item.label.formatter);
+                         eval('item.label.formatter=' + item.label.formatter)
+                    }
+                });
+                console.log(j_data);
+                chart3.setOption(j_data);
+            }
+        });
+    }
 
 
 </script>

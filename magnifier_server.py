@@ -2,6 +2,7 @@ from sanic import Sanic
 from sanic.response import json
 
 from chartbox.bidp import bidp_api_heart, bidp_api_update
+from chartbox.login import login_status
 from chartbox.slide import slide_cnt
 
 # 初始化 Sanic
@@ -43,6 +44,12 @@ async def bidp_heart_data_update(request):
         if i[0] > last_time:
             return json([i])
     return json(new_data)
+
+
+@app.route("/login_status_data", methods=["GET"])
+async def login_status_data(request):
+    c = login_status()
+    return json(c.dump_options_with_quotes())
 
 
 if __name__ == '__main__':
