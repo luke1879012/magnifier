@@ -14,7 +14,7 @@ from pyecharts import options as opts
 from pyecharts.charts import Line
 
 from utils.database import get_db
-
+LIMIT = 5
 
 def get_x_y_data(data):
     x_data = []
@@ -50,7 +50,7 @@ def get_x_y_data(data):
 def bidp_api_heart():
     db = get_db()
     with db.cursor() as cursor:
-        cursor.execute("SELECT health_value, crt_time FROM bidp_api_heart order by crt_time desc limit 5;")
+        cursor.execute(f"SELECT health_value, crt_time FROM bidp_api_heart order by crt_time desc limit {LIMIT};")
         data = cursor.fetchall()
         data = reversed(data)
 
@@ -82,7 +82,7 @@ def bidp_api_update(last_time):
     db = get_db()
     with db.cursor() as cursor:
         cursor.execute(
-            "SELECT health_value, crt_time FROM bidp_api_heart where crt_time > %s order by crt_time desc limit 5;",
+            f"SELECT health_value, crt_time FROM bidp_api_heart where crt_time > %s order by crt_time desc limit {LIMIT};",
             (last_time,))
         data = cursor.fetchall()
         if not data:
