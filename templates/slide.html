@@ -31,17 +31,23 @@
 <body>
 <div class="grid-container">
     <div id="slide1" class="grid-item">1</div>
-    <div id="slide2" class="grid-item">2</div>
+    <div id="bidp2" class="grid-item">2</div>
     <div id="slide3" class="grid-item">3</div>
     <div id="slide4" class="grid-item">4</div>
 </div>
 
 <script>
     var chart1 = echarts.init(document.getElementById('slide1'), 'white', {renderer: 'canvas'});
+    var chart2 = echarts.init(document.getElementById('bidp2'), 'white', {renderer: 'canvas'});
+    var last_bidp_time = '';
+    var bidp_old_data = [];
+    var bidp_len = 0;
     $(
         function () {
             fetchData();
+            fetchDataBidpAll();
             setInterval(fetchData, 1000 * 60 * 2);  // 2分钟刷新
+            setInterval(fetchDataBidpUpdate, 1000 * 2);
         }
     );
 
@@ -54,7 +60,63 @@
                 chart1.setOption(JSON.parse(result));
             }
         });
-    }
+    };
+
+    function fetchDataBidpAll() {
+        $.ajax({
+            type: "GET",
+            url: "/bidp_heart_data",
+            dataType: "json",
+            success: function (result) {
+                chart2.setOption(JSON.parse(result));
+                bidp_old_data = chart2.getOption().series[0].data;
+                last_bidp_time = bidp_old_data[bidp_old_data.length - 1][0];
+                bidp_len = bidp_old_data.length;
+            }
+        });
+    };
+
+    function fetchDataBidpUpdate() {
+        $.ajax({
+            type: "GET",
+            url: "/bidp_heart_data_update",
+            dataType: "json",
+            data: {last_time: last_bidp_time},
+            success: function (result) {
+                console.log(result);
+                if (result.length === 0) {
+                    return;
+                }
+                let bidp_new_data = result;
+
+                // bidp_old_data = chart2.getOption().series[0].data;
+                // last_bidp_time = bidp_old_data[0][1];
+                // 合并两个列表
+                let combined = [...bidp_new_data, ...bidp_old_data];
+
+                // 去重，假设第一个元素是唯一标识符
+                let uniqueMap = new Map(combined.map(item => [item[0], item]));
+
+                // 将Map对象转换回数组
+                let uniqueArray = Array.from(uniqueMap.values());
+
+                // 排序，基于日期时间字符串
+                uniqueArray.sort((a, b) => new Date(a[0]) - new Date(b[0]));
+
+                // 保留最后5个元素
+                let lastFiveItems = uniqueArray.slice(-bidp_len);
+
+                chart2.setOption({
+                    series: [{
+                        data: lastFiveItems
+                    }]
+                });
+                bidp_old_data = lastFiveItems;
+                last_bidp_time = lastFiveItems[lastFiveItems.length - 1][0];
+            }
+        });
+    };
+
 
 </script>
 </body>
