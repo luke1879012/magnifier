@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <script src="/static/jquery/3.0.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/echarts.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 将容器分成两列 */
+            grid-template-rows: 1fr 1fr; /* 将容器分成两行 */
+            height: 100%; /* 网格占满整个父容器的高度 */
+            width: 100%; /* 网格占满整个父容器的宽度 */
+        }
+
+        .grid-item {
+            display: flex;
+            justify-content: center; /* 水平居中内容 */
+            align-items: center; /* 垂直居中内容 */
+            /*border: 1px solid #000; !* 边框 *!*/
+        }
+    </style>
+</head>
+<body>
+<div class="grid-container" id="sche">
+</div>
+<script>
+    var chart = echarts.init(document.getElementById('sche'), 'white', {renderer: 'canvas'});
+    $(
+        function () {
+            fetchData();
+            setInterval(fetchData, 1000 * 60 * 5);
+        }
+    );
+
+    function fetchData() {
+        $.ajax({
+            type: "GET",
+            url: "/sche_status",
+            dataType: "json",
+            success: function (result) {
+                j_data = JSON.parse(result);
+                console.log(j_data);
+                console.log(j_data['tooltip']['formatter']);
+                eval("j_data['tooltip']['formatter'] = " + j_data['tooltip']['formatter'])
+                // j_data['series'].forEach(function (item) {
+                //     if (item.hasOwnProperty('label') && item.label.hasOwnProperty('formatter')) {
+                //         console.log(item.label.formatter);
+                //          eval('item.label.formatter=' + item.label.formatter)
+                //     }
+                // });
+                chart.setOption(j_data);
+            }
+        });
+    };
+
+</script>
+</body>
+</html>

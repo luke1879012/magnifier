@@ -3,6 +3,7 @@ from sanic.response import json
 
 from chartbox.bidp import bidp_api_heart, bidp_api_update
 from chartbox.login import login_status
+from chartbox.sche import sche_run_time
 from chartbox.slide import slide_cnt
 
 # 初始化 Sanic
@@ -12,6 +13,7 @@ app.static("/", "./templates/index.html", name="index")
 app.static("/static", "./static", name="static_data")
 app.static("/bar_test", "./templates/bar_test.html", name="bar_test")
 app.static("/slide", "./templates/slide.html", name="slide")
+app.static("/sche", "./templates/sche_run.html", name="sche")
 
 
 @app.route("/bar_test_data", methods=["GET"])
@@ -49,6 +51,12 @@ async def bidp_heart_data_update(request):
 @app.route("/login_status_data", methods=["GET"])
 async def login_status_data(request):
     c = login_status()
+    return json(c.dump_options_with_quotes())
+
+
+@app.route("/sche_status", methods=["GET"])
+async def sche_status_data(request):
+    c = sche_run_time()
     return json(c.dump_options_with_quotes())
 
 
