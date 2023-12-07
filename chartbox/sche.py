@@ -100,8 +100,8 @@ def sche_run_time():
             type_="category",
             splitarea_opts=opts.SplitAreaOpts(
                 is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1),
-
             ),
+            axislabel_opts=opts.LabelOpts( interval=0,),
         ),
         tooltip_opts=opts.TooltipOpts(formatter=JsCode(
             f"function(x){{return 'sche_id: '+{sched_ids}[x.data[0]][x.data[1]] + '<br>v: '+ x.data[2] + '<br>t: '+x.name;}}"
