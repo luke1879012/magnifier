@@ -104,7 +104,7 @@ def sche_run_time():
             ),
         ),
         tooltip_opts=opts.TooltipOpts(formatter=JsCode(
-            f"function(x){{return  'sche_id: '+{sched_ids}[x.data[0]][x.data[1]] + '<br>v: '+ x.data[2];}}"
+            f"function(x){{return 'sche_id: '+{sched_ids}[x.data[0]][x.data[1]] + '<br>v: '+ x.data[2] + '<br>t: '+x.name;}}"
         )),
         visualmap_opts=opts.VisualMapOpts(
             min_=0, max_=max_data + 10, is_calculable=True, orient="vertical", pos_left="auto"
