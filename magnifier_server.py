@@ -13,6 +13,7 @@ app.static("/", "./templates/index.html", name="index")
 app.static("/static", "./static", name="static_data")
 app.static("/bar_test", "./templates/bar_test.html", name="bar_test")
 app.static("/slide", "./templates/slide.html", name="slide")
+app.static("/login_status", "./templates/slide.html", name="login_status")
 app.static("/sche", "./templates/sche_run.html", name="sche")
 
 
@@ -54,7 +55,7 @@ async def login_status_data(request):
     return json(c.dump_options_with_quotes())
 
 
-@app.route("/sche_status", methods=["GET"])
+@app.route("/sche_status_data", methods=["GET"])
 async def sche_status_data(request):
     c = sche_run_time()
     return json(c.dump_options_with_quotes())

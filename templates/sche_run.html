@@ -44,7 +44,7 @@
     function fetchData() {
         $.ajax({
             type: "GET",
-            url: "/sche_status",
+            url: "/sche_status_data",
             dataType: "json",
             success: function (result) {
                 j_data = JSON.parse(result);
