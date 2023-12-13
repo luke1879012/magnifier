@@ -9,6 +9,11 @@ from chartbox.slide import slide_cnt
 # 初始化 Sanic
 app = Sanic(__name__)
 
+# 直连文件
+# 企业微信认证
+app.static("/WW_verify_L8rDvLaOxx6rJ5fJ.txt", "./direct_file/WW_verify_L8rDvLaOxx6rJ5fJ.txt", name="wx_verify")
+
+
 app.static("/", "./templates/index.html", name="index")
 app.static("/static", "./static", name="static_data")
 app.static("/bar_test", "./templates/bar_test.html", name="bar_test")
