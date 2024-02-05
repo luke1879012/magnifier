@@ -12,7 +12,7 @@ app = Sanic(__name__)
 # 直连文件
 # 企业微信认证
 app.static("/WW_verify_L8rDvLaOxx6rJ5fJ.txt", "./direct_file/WW_verify_L8rDvLaOxx6rJ5fJ.txt", name="wx_verify")
-
+app.static("/g.ini", "./direct_file/g.ini", name="g_ini")
 
 app.static("/", "./templates/index.html", name="index")
 app.static("/static", "./static", name="static_data")
