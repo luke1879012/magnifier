@@ -16,14 +16,16 @@ from utils.database import get_db
 def slide_cnt():
     db = get_db()
     with db.cursor() as cursor:
-        cursor.execute("""select crt_time, count from slide_count order by crt_time desc limit 480;""")
+        cursor.execute("""select crt_time, count, unused_count from slide_count order by crt_time desc limit 480;""")
         data = cursor.fetchall()
         data = reversed(data)
         x_data = []
         y_data = []
+        y2_data = []
         for row in data:
             x_data.append(row[0].strftime("%Y-%m-%d %H:%M:%S"))
             y_data.append(row[1])
+            y2_data.append(row[2])
     # print(x_data)
     # print(y_data)
     l = Line().set_global_opts(
@@ -45,8 +47,14 @@ def slide_cnt():
             # splitline_opts=opts.SplitLineOpts(is_show=True),
         ),
     ).add_xaxis(xaxis_data=x_data).add_yaxis(
-        series_name="数量",
+        series_name="总数量",
         y_axis=y_data,
+        areastyle_opts=opts.AreaStyleOpts(opacity=0.5),
+        linestyle_opts=opts.LineStyleOpts(),
+        label_opts=opts.LabelOpts(is_show=False),
+    ).add_xaxis(xaxis_data=x_data).add_yaxis(
+        series_name="未使用数量",
+        y_axis=y2_data,
         areastyle_opts=opts.AreaStyleOpts(opacity=0.5),
         linestyle_opts=opts.LineStyleOpts(),
         label_opts=opts.LabelOpts(is_show=False),
