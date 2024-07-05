@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>canary</title>
+    <script src="/static/vue/3.4.31/vue.global.js"></script>
+    <script src="/static/axios/1.6.7/axios.min.js"></script>
+
+    <!--  感谢 https://plnkr.co/edit/AA74u8B1DeJ1J6DB?open=lib%2Fscript.js&preview  -->
+    <script src="/static/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- BS5.1.1 CSS/JS -->
+    <!-- 升级到5.1   -->
+    <!--    <link rel="stylesheet" href="/static/twitter-bootstrap/4.3.1/css/bootstrap.min.css">-->
+    <link href="/static/bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">
+    <script src="/static/bootstrap/5.1.1/bootstrap.bundle.min.js"></script>
+
+    <!-- Latest BS-Select compiled and minified CSS/JS -->
+    <link rel="stylesheet" href="/static/bootstrap-select/1.14.0-beta2/bootstrap-select.min.css">
+    <script src="/static/bootstrap-select/1.14.0-beta2/bootstrap-select.min.js"></script>
+    <!--    https://www.itxst.com/bootstrap-datepicker/tutorial.html-->
+    <!--    <link rel="stylesheet"-->
+    <!--          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/locales/bootstrap-datepicker.zh-CN.min.js"></script>-->
+
+    <style>
+
+        .long-text {
+            width: 550px; /* 设置容器宽度 */
+            white-space: nowrap; /* 不允许换行 */
+            overflow: hidden; /* 隐藏超出部分 */
+            text-overflow: ellipsis; /* 添加省略号 */
+        }
+
+        .account-text {
+            width: 220px; /* 设置容器宽度 */
+            white-space: nowrap; /* 不允许换行 */
+            overflow: hidden; /* 隐藏超出部分 */
+            text-overflow: ellipsis; /* 添加省略号 */
+        }
+
+        .left-panel {
+            width: 50%;
+            /* 左侧面板样式控制 */
+        }
+
+        .right-panel {
+            width: 50%;
+            /* 右侧面板样式控制 */
+        }
+
+        .app-padding {
+            margin: 30px; /* 设置外边距为30像素，这会分别影响到上、右、下、左四个方向 */
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div id="app" class="app-padding">
+    <div>
+        <div class="left-panel">
+            <form class="row g-3 needs-validation" novalidate>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">task id</span>
+                    <input type="text" class="form-control" v-model="search_task_id">
+                    <span class="input-group-text">start_time</span>
+                    <input type="text" class="form-control" placeholder="%Y-%m-%d %H:%M:%S" v-model="search_start_time"
+                           required>
+                    <span class="input-group-text">end_time</span>
+                    <input type="text" class="form-control" placeholder="%Y-%m-%d %H:%M:%S" v-model="search_end_time">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" style="margin-right: 2px">request_user</span>
+                    <div>
+                        <select class="selectpicker" multiple v-model="search_user">
+                            <option v-for="one_user in user" :value="one_user" :key="one_user">
+                                {{ one_user }}
+                            </option>
+                        </select>
+                    </div>
+                    <span class="input-group-text" style="margin-right: 2px; margin-left: 2px">category</span>
+                    <div>
+                        <select class="selectpicker" multiple v-model="search_category">
+                            <option v-for="one_cate in category" :value="one_cate" :key="one_cate">
+                                {{ one_cate }}
+                            </option>
+                        </select>
+                    </div>
+                    <div style="width: 50px"></div>
+                    <div>
+                        <button type="button" class="btn btn-dark" style="width: 150px" @click="query_data">Search
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+        <div class="right-panel">
+            <!-- 右侧内容 -->
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+        <tr>
+            <th scope="col"> </th>
+            <th scope="col">shovel_info</th>
+            <th scope="col">shop_info</th>
+            <th scope="col">alert_info</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="todo in todos" :key="todo.id">
+            <td>
+                <label style="display: inline-block; width: 100%; cursor: pointer;">
+                    <input type="checkbox" v-model="todo.is_ok">
+                </label>
+            </td>
+            <td>
+                <table class="table mb-0 table-sm">
+                    <tr>
+                        <td>{{ todo.shovel_project }}</td>
+                        <td>{{ todo.shovel_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>path_id: {{ todo.path_id }}</td>
+                        <td>
+                            <div :title="todo.target_page">{{ todo.target_page }}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>task_id: {{ todo.task_id }}</td>
+                        <td>machine: {{ todo.machine }}</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="table mb-1 table-sm">
+                    <tr>
+                        <td colspan="2">{{ todo.platform_code }}</td>
+                    </tr>
+                    <tr>
+                        <td>account_id: {{ todo.account_id }}</td>
+                        <td>
+                            <div class="account-text" :title="todo.account_name">{{ todo.account_name }}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>shop_id: {{ todo.shop_id }}</td>
+                        <td>
+                            <div class="account-text" :title="todo.shop_name">{{ todo.shop_name }}</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="table mb-2 table-sm">
+                    <tr>
+                        <td colspan="2">
+                            <div class="long-text" :title="todo.reason">{{ todo.reason }}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ todo.category }}</td>
+                        <td>alert_time: {{ todo.alert_time }}</td>
+                    </tr>
+                    <tr>
+                        <td>request_user: {{ todo.request_user }}</td>
+                        <td>alert_id: {{ todo.alert_id }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-start">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" v-model="all_checked" @click="toggle_all"/>
+            <label class="form-check-label">全选</label>
+        </div>
+        <div style="width: 50px;"></div>
+        <button type="button" class="btn btn-success" style="width: 150px" @click="send_finish">朕已阅</button>
+        <div style="width: 50px;"></div>
+        <div v-if="finish_show" class="alert alert-info">{{ finish_msg }}</div>
+    </div>
+
+
+</div>
+<script type="module">
+    const {createApp, ref} = Vue
+    const loading = '正在加载数据, 请稍候  (￣o￣) . z Z'
+    // todo 增加localstorage的缓存
+
+    const app = createApp({
+        // el: '#app',
+        data() {
+            return {
+                res_todos: [],  // 查询响应数据
+                todos: [  // 页面展示数据
+                    {id: 1, shovel_project: loading, platform_code: loading, reason: loading},
+                ],
+                search_user: [],
+                user: ["zhchen8", "yqzhang2", "sxzhang1"],
+                search_task_id: '',
+                search_start_time: '',
+                search_end_time: '',
+                search_category: [
+                    "Cookie Invalidated", "Target Resource Lost", "Shovel Error"
+                ],
+                category: [
+                    "Shovel Error",
+                    "Cookie Invalidated",
+                    "Target Resource Lost",
+                    "Account Not Permitted",
+                    "Target Resource Null",
+                    "Resource Delay",
+                    "Target Resource Strange",
+                ],
+                all_checked: false,
+                finish_show: false,
+                finish_msg: ''
+            }
+        },
+        created() {
+            const t_3 = new Date();
+            t_3.setDate(t_3.getDate() - 3); // 获取前天的日期
+            this.search_start_time = t_3.toISOString().slice(0, 10) + ' 00:00:00'; // 转换为'YYYY-MM-DD'格式的字符串
+        },
+        mounted() {
+            this.query_data();
+        },
+        methods: {
+            query_data() {
+                axios.post('/api_canary_query', {
+                    task_id: this.search_task_id,
+                    start_time: this.search_start_time,
+                    end_time: this.search_end_time,
+                    category: this.search_category,
+                }, {headers: {'Content-Type': 'application/json'}})
+                    .then(response => {
+                        this.res_todos = response.data;
+                        this.transfer_todo();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching todos:', error);
+                        alert(error);
+                    });
+            },
+            transfer_todo() {
+                this.todos = []
+                for (let i = 0; i < this.res_todos.length; i++) {
+                    this.todos.push({
+                        ...this.res_todos[i],
+                        is_ok: Boolean(this.res_todos[i].finish_time)
+                    })
+                }
+            },
+            toggle_all() {
+                this.all_checked = !this.all_checked;
+                this.todos.forEach((todo) => (todo.is_ok = this.all_checked));
+            },
+
+        }
+    });
+    app.mount('#app')
+</script>
+</body>
+</html>

@@ -2,6 +2,7 @@ from sanic import Sanic
 from sanic.response import json
 
 from chartbox.bidp import bidp_api_heart, bidp_api_update
+from chartbox.canary import canary_query, canary_finish
 from chartbox.login import login_status
 from chartbox.sche import sche_run_time
 from chartbox.slide import slide_cnt
@@ -20,6 +21,9 @@ app.static("/bar_test", "./templates/bar_test.html", name="bar_test")
 app.static("/slide", "./templates/slide.html", name="slide")
 app.static("/login_status", "./templates/slide.html", name="login_status")
 app.static("/sche", "./templates/sche_run.html", name="sche")
+# 报警系统
+app.static("/canary_overview", "./templates/canary_overview.html", name="canary_overview")
+app.static("/test", "./templates/test.html", name="test")
 
 
 @app.route("/bar_test_data", methods=["GET"])
@@ -66,6 +70,21 @@ async def sche_status_data(request):
     return json(c.dump_options_with_quotes())
 
 
+@app.route("/api_canary_query", methods=["POST"])
+async def api_canary_query(request):
+    data = request.json
+    ret_data = canary_query(data)
+    return json(ret_data)
+
+@app.route("/api_canary_finish", methods=["POST"])
+async def api_canary_finish(request):
+    data = request.json
+    ret_data = canary_finish(data)
+    return json(ret_data)
+
+
+
 if __name__ == '__main__':
     # mf
-    app.run(host="0.0.0.0", port=17312, debug=True)
+    # todo 17312端口
+    app.run(host="0.0.0.0", port=17313, debug=True)

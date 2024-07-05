@@ -28,5 +28,9 @@ def get_db(database_name: str = "show_data"):
             host='rm-bp1au71v1a4zj205u4o.mysql.rds.aliyuncs.com',
             user='viewer', password="vieweR6210773768", database=database_name
         )
+    elif database_name == 'l_test':
+        return pymysql.connect(
+            host='mysql.luke9012.cn',
+            user='l_test', password='luke_test123', database=database_name)
     else:
         raise TypeError(f"未找到{database_name}")

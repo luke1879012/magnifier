@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>bootstrap-datepicker例子</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
+    <script src="/static/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/static/bootstrap/5.1.1/bootstrap.bundle.min.js"></script>
+    <link href="/static/bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+</head>
+<body style="padding:10px;">
+    <div class="container ">
+        <input type="text" id="inputDate" class="form-control" placeholder="请选择日期">
+    </div>
+    <script>
+        $("#inputDate").datepicker({
+            language: 'zh-CN', //语言
+            autoclose: true, //选择后自动关闭
+            clearBtn: true,//清除按钮
+            format: "yyyy-mm-dd"//日期格式
+        });
+    </script>
+</body>
+</html>
