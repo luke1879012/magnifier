@@ -18,11 +18,6 @@
     <!-- Latest BS-Select compiled and minified CSS/JS -->
     <link rel="stylesheet" href="/static/bootstrap-select/1.14.0-beta2/bootstrap-select.min.css">
     <script src="/static/bootstrap-select/1.14.0-beta2/bootstrap-select.min.js"></script>
-    <!--    https://www.itxst.com/bootstrap-datepicker/tutorial.html-->
-    <!--    <link rel="stylesheet"-->
-    <!--          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">-->
-    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>-->
-    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/locales/bootstrap-datepicker.zh-CN.min.js"></script>-->
 
     <style>
 
@@ -42,12 +37,12 @@
 
         .left-panel {
             width: 50%;
-            /* 左侧面板样式控制 */
+            float: left;
         }
 
         .right-panel {
             width: 50%;
-            /* 右侧面板样式控制 */
+            float: right;
         }
 
         .app-padding {
@@ -63,7 +58,7 @@
     <div>
         <div class="left-panel">
             <form class="row g-3 needs-validation" novalidate>
-                <div class="input-group mb-3">
+                <div class="input-group mb-3" style="margin-right: 10px;">
                     <span class="input-group-text">task id</span>
                     <input type="text" class="form-control" v-model="search_task_id">
                     <span class="input-group-text">start_time</span>
@@ -71,6 +66,7 @@
                            required>
                     <span class="input-group-text">end_time</span>
                     <input type="text" class="form-control" placeholder="%Y-%m-%d %H:%M:%S" v-model="search_end_time">
+
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text" style="margin-right: 2px">request_user</span>
@@ -96,17 +92,29 @@
                     </div>
 
                 </div>
+
+                <div class="input-group mb-3">
+                    <div>
+                        <select class="selectpicker" v-model="search_show_status">
+                            <option v-for="ss in show_status" :value="ss.value">
+                                {{ ss.label }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+
             </form>
         </div>
         <div class="right-panel">
-            <!-- 右侧内容 -->
+            <div style="text-align: center">敬请期待 (oﾟvﾟ)ノ</div>
         </div>
     </div>
 
     <table class="table table-bordered table-striped table-hover">
         <thead>
         <tr>
-            <th scope="col"> </th>
+            <th scope="col"></th>
             <th scope="col">shovel_info</th>
             <th scope="col">shop_info</th>
             <th scope="col">alert_info</th>
@@ -183,7 +191,7 @@
             <label class="form-check-label">全选</label>
         </div>
         <div style="width: 50px;"></div>
-        <button type="button" class="btn btn-success" style="width: 150px" @click="send_finish">朕已阅</button>
+        <button type="button" class="btn btn-success" style="width: 150px" @click="finish_data">朕已阅</button>
         <div style="width: 50px;"></div>
         <div v-if="finish_show" class="alert alert-info">{{ finish_msg }}</div>
     </div>
@@ -211,6 +219,12 @@
                 search_category: [
                     "Cookie Invalidated", "Target Resource Lost", "Shovel Error"
                 ],
+                show_status: [
+                    {value: '1', label: 'only ✔'},
+                    {value: '0', label: 'all'},
+                    {value: '-1', label: 'only 🔲'},
+                ],
+                search_show_status: '-1',
                 category: [
                     "Shovel Error",
                     "Cookie Invalidated",
@@ -240,6 +254,7 @@
                     start_time: this.search_start_time,
                     end_time: this.search_end_time,
                     category: this.search_category,
+                    is_ok: this.search_show_status,
                 }, {headers: {'Content-Type': 'application/json'}})
                     .then(response => {
                         this.res_todos = response.data;
@@ -263,7 +278,22 @@
                 this.all_checked = !this.all_checked;
                 this.todos.forEach((todo) => (todo.is_ok = this.all_checked));
             },
-
+            finish_data() {
+                const send_data = [];
+                this.todos.forEach((todo) => {
+                    send_data.push({'id': todo.id, 'is_ok': todo.is_ok, 'finish_time': todo.finish_time})
+                })
+                axios.post('/api_canary_finish', {
+                    send_data: send_data,
+                }, {headers: {'Content-Type': 'application/json'}})
+                    .then(response => {
+                        this.query_data();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching todos:', error);
+                        alert(error);
+                    });
+            },
         }
     });
     app.mount('#app')

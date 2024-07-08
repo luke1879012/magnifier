@@ -25,9 +25,9 @@ def get_err_msg(msg):
 
 
 def canary_query(data):
-    print(f"{data=}")
+    print(f"canary_query {data=}")
     max_query_num = 4000
-    fields = ["start_time", "end_time", "task_id", "category"]
+    fields = ["start_time", "end_time", "task_id", "category", "is_ok"]
 
     query_params = {}
     if not data:
@@ -59,6 +59,12 @@ def canary_query(data):
         where_list.append("category in (" + ",".join(["%s"] * len(category)) + ")")
         where_value += category
 
+    if is_ok := query_params.get("is_ok"):
+        if is_ok == '1':
+            where_list.append("finish_time is not null")
+        elif is_ok == '-1':
+            where_list.append("finish_time is null")
+
     where_str = " and ".join(where_list)
     db = get_db("l_test")
 
@@ -84,4 +90,40 @@ def canary_query(data):
 
 
 def canary_finish(data):
-    pass
+    print(f"canary_finish {data=}")
+    send_data = data.get("send_data")
+    if not send_data:
+        return []
+
+    done_lst = []
+    ing_lst = []
+    for data in send_data:
+        if data['is_ok']:  # 勾选完成
+            if data['finish_time']:  # 有结束时间
+                pass  # 以前就完成了，跳过
+            else:  # 没有结束时间
+                done_lst.append(str(data['id']))
+        else:  # 没勾选完成
+            if data['finish_time']:  # 删除勾选按钮
+                ing_lst.append(str(data['id']))
+            else:
+                pass  # 以前就没勾选，跳过
+
+    if done_lst:
+        db = get_db("l_test")
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with db.cursor() as cursor:
+            sql_str = f"UPDATE cheget SET finish_time = '{now}' WHERE id in ({','.join(done_lst)});"
+            print(f"done_lst: {sql_str=}")
+            cursor.execute(sql_str)
+            db.commit()
+
+    if ing_lst:
+        db = get_db("l_test")
+        with db.cursor() as cursor:
+            sql_str = f"UPDATE cheget SET finish_time = null WHERE id in ({','.join(ing_lst)});"
+            print(f"ing_lst: {sql_str=}")
+            cursor.execute(sql_str)
+            db.commit()
+
+    return []
