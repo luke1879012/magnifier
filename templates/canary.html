@@ -107,7 +107,10 @@
             </form>
         </div>
         <div class="right-panel">
-            <div style="text-align: center">敬请期待 (oﾟvﾟ)ノ</div>
+            <!--            <div style="text-align: center">敬请期待 (oﾟvﾟ)ノ</div>-->
+            <div style="text-align: center">1911年，英国的矿工们开始把金丝雀带入矿井。</div>
+            <div style="text-align: center">这些小鸟对一氧化碳非常敏感，微量的一氧化碳泄露就会让它们焦躁、啼叫甚至死亡。</div>
+            <div style="text-align: center">所以，一旦井下的金丝雀表现异样，矿工就得知危险来临，会迅速逃离矿井保命。</div>
         </div>
     </div>
 
@@ -201,7 +204,7 @@
 <script type="module">
     const {createApp, ref} = Vue
     const loading = '正在加载数据, 请稍候  (￣o￣) . z Z'
-    // todo 增加localstorage的缓存
+    const empty_lst = ['活干完了, 休息休息 (～￣▽￣)～', "查询结果为空 (>'-'<)"]
 
     const app = createApp({
         // el: '#app',
@@ -212,7 +215,11 @@
                     {id: 1, shovel_project: loading, platform_code: loading, reason: loading},
                 ],
                 search_user: [],
-                user: ["zhchen8", "yqzhang2", "sxzhang1"],
+                user: [
+                    "qhpeng", "zhchen8", "hchen23", "gfzhou",
+                    "ytzheng2", "sbzhang1", "yqzhang2", "sxzhang1",
+                    "fwang-kf",
+                ],
                 search_task_id: '',
                 search_start_time: '',
                 search_end_time: '',
@@ -240,11 +247,12 @@
             }
         },
         created() {
-            const t_3 = new Date();
-            t_3.setDate(t_3.getDate() - 3); // 获取前天的日期
-            this.search_start_time = t_3.toISOString().slice(0, 10) + ' 00:00:00'; // 转换为'YYYY-MM-DD'格式的字符串
+            const start_time = new Date();
+            start_time.setDate(start_time.getDate() - 7);
+            this.search_start_time = start_time.toISOString().slice(0, 10) + ' 00:00:00'; // 转换为'YYYY-MM-DD'格式的字符串
         },
         mounted() {
+            this.load_user();
             this.query_data();
         },
         methods: {
@@ -255,10 +263,12 @@
                     end_time: this.search_end_time,
                     category: this.search_category,
                     is_ok: this.search_show_status,
+                    search_user: this.search_user,
                 }, {headers: {'Content-Type': 'application/json'}})
                     .then(response => {
                         this.res_todos = response.data;
                         this.transfer_todo();
+                        this.save_user();
                     })
                     .catch(error => {
                         console.error('Error fetching todos:', error);
@@ -272,6 +282,11 @@
                         ...this.res_todos[i],
                         is_ok: Boolean(this.res_todos[i].finish_time)
                     })
+                }
+                if (this.todos.length === 0) {
+                    const randomIndex = Math.floor(Math.random() * empty_lst.length);
+                    const empty = empty_lst[randomIndex];
+                    this.todos.push({id: 1, shovel_project: empty, platform_code: empty, reason: empty})
                 }
             },
             toggle_all() {
@@ -293,6 +308,17 @@
                         console.error('Error fetching todos:', error);
                         alert(error);
                     });
+            },
+            save_user() {
+                localStorage.setItem('local_user', JSON.stringify(this.search_user))
+            },
+            load_user() {
+                let local_user = localStorage.getItem("local_user")
+                if (local_user === null) {
+                    this.search_user = []
+                } else {
+                    this.search_user = JSON.parse(local_user)
+                }
             },
         }
     });

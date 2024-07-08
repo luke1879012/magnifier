@@ -22,7 +22,7 @@ app.static("/slide", "./templates/slide.html", name="slide")
 app.static("/login_status", "./templates/slide.html", name="login_status")
 app.static("/sche", "./templates/sche_run.html", name="sche")
 # 报警系统
-app.static("/canary_overview", "./templates/canary_overview.html", name="canary_overview")
+app.static("/canary", "./templates/canary.html", name="canary")
 app.static("/test", "./templates/test.html", name="test")
 
 
@@ -86,5 +86,4 @@ async def api_canary_finish(request):
 
 if __name__ == '__main__':
     # mf
-    # todo 17312端口
-    app.run(host="0.0.0.0", port=17313, debug=True)
+    app.run(host="0.0.0.0", port=17312, debug=True)

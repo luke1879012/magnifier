@@ -27,7 +27,7 @@ def get_err_msg(msg):
 def canary_query(data):
     print(f"canary_query {data=}")
     max_query_num = 4000
-    fields = ["start_time", "end_time", "task_id", "category", "is_ok"]
+    fields = ["start_time", "end_time", "task_id", "category", "is_ok", "search_user"]
 
     query_params = {}
     if not data:
@@ -58,6 +58,10 @@ def canary_query(data):
     if category := query_params.get("category"):
         where_list.append("category in (" + ",".join(["%s"] * len(category)) + ")")
         where_value += category
+
+    if search_user := query_params.get("search_user"):
+        where_list.append("request_user in (" + ",".join(["%s"] * len(search_user)) + ")")
+        where_value += search_user
 
     if is_ok := query_params.get("is_ok"):
         if is_ok == '1':
