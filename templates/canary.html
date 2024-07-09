@@ -109,7 +109,8 @@
         <div class="right-panel">
             <!--            <div style="text-align: center">敬请期待 (oﾟvﾟ)ノ</div>-->
             <div style="text-align: center">1911年，英国的矿工们开始把金丝雀带入矿井。</div>
-            <div style="text-align: center">这些小鸟对一氧化碳非常敏感，微量的一氧化碳泄露就会让它们焦躁、啼叫甚至死亡。</div>
+            <div style="text-align: center">这些小鸟对一氧化碳非常敏感，微量的一氧化碳泄露就会让它们焦躁、啼叫甚至死亡。
+            </div>
             <div style="text-align: center">所以，一旦井下的金丝雀表现异样，矿工就得知危险来临，会迅速逃离矿井保命。</div>
         </div>
     </div>
@@ -200,7 +201,17 @@
     </div>
 
 
+    <div style="width: 30px; height: 44px; position: absolute; right: 0; bottom: 0;" id="candles"
+         @click="candles_click">🕯
+    </div>
 </div>
+<script>  // 蜡烛悬浮代码
+window.onscroll = function () {
+    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    var candles = document.getElementById('candles');
+    candles.style.top = document.documentElement.clientHeight - candles.offsetHeight + scrollTop + 'px'
+}
+</script>
 <script type="module">
     const {createApp, ref} = Vue
     const loading = '正在加载数据, 请稍候  (￣o￣) . z Z'
@@ -224,7 +235,7 @@
                 search_start_time: '',
                 search_end_time: '',
                 search_category: [
-                    "Cookie Invalidated", "Target Resource Lost", "Shovel Error"
+                    "Cookie Invalidated", "Target Resource Lost", "Shovel Error", "Third Service Error"
                 ],
                 show_status: [
                     {value: '1', label: 'only ✔'},
@@ -236,6 +247,7 @@
                     "Shovel Error",
                     "Cookie Invalidated",
                     "Target Resource Lost",
+                    "Third Service Error",
                     "Account Not Permitted",
                     "Target Resource Null",
                     "Resource Delay",
@@ -319,6 +331,9 @@
                 } else {
                     this.search_user = JSON.parse(local_user)
                 }
+            },
+            candles_click() {
+                alert("墓室的东南角先点一根蜡烛")
             },
         }
     });
