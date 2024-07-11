@@ -205,13 +205,13 @@
          @click="candles_click">🕯
     </div>
 </div>
-<script>  // 蜡烛悬浮代码
-window.onscroll = function () {
-    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    var candles = document.getElementById('candles');
-    candles.style.top = document.documentElement.clientHeight - candles.offsetHeight + scrollTop + 'px'
-}
-</script>
+<!--<script>  // 蜡烛悬浮代码(好像有bug，先关闭)-->
+<!--window.onscroll = function () {-->
+<!--    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;-->
+<!--    var candles = document.getElementById('candles');-->
+<!--    candles.style.top = document.documentElement.clientHeight - candles.offsetHeight + scrollTop + 'px'-->
+<!--}-->
+<!--</script>-->
 <script type="module">
     const {createApp, ref} = Vue
     const loading = '正在加载数据, 请稍候  (￣o￣) . z Z'
