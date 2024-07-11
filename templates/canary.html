@@ -315,6 +315,7 @@
                 }, {headers: {'Content-Type': 'application/json'}})
                     .then(response => {
                         this.query_data();
+                        this.all_checked = false;
                     })
                     .catch(error => {
                         console.error('Error fetching todos:', error);
