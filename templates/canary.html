@@ -120,7 +120,7 @@
         <tr>
             <th scope="col"></th>
             <th scope="col">shovel_info</th>
-            <th scope="col">shop_info</th>
+            <th scope="col">shop_info/table_name</th>
             <th scope="col">alert_info</th>
         </tr>
         </thead>
@@ -152,7 +152,7 @@
             <td>
                 <table class="table mb-1 table-sm">
                     <tr>
-                        <td colspan="2">{{ todo.platform_code }}</td>
+                        <td>{{ todo.platform_code }}</td><td>{{ todo.table_names }}</td>
                     </tr>
                     <tr>
                         <td>account_id: {{ todo.account_id }}</td>
@@ -265,7 +265,7 @@
         },
         created() {
             const start_time = new Date();
-            start_time.setDate(start_time.getDate() - 7);
+            start_time.setDate(start_time.getDate() - 3);
             this.search_start_time = start_time.toISOString().slice(0, 10) + ' 00:00:00'; // 转换为'YYYY-MM-DD'格式的字符串
         },
         mounted() {
