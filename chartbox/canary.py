@@ -98,6 +98,7 @@ def canary_finish(data):
     send_data = data.get("send_data")
     if not send_data:
         return []
+    finish_reason = data.get("finish_reason", '')
 
     done_lst = []
     ing_lst = []
@@ -117,7 +118,8 @@ def canary_finish(data):
         db = get_db("l_test")
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with db.cursor() as cursor:
-            sql_str = f"UPDATE cheget SET finish_time = '{now}' WHERE id in ({','.join(done_lst)});"
+            sql_str = (f"UPDATE cheget SET finish_time = '{now}', finish_reason='{finish_reason}' "
+                       f"WHERE id in ({','.join(done_lst)});")
             print(f"done_lst: {sql_str=}")
             cursor.execute(sql_str)
             db.commit()
