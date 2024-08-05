@@ -147,6 +147,12 @@
                         <td>task_id: {{ todo.task_id }}</td>
                         <td>machine: {{ todo.machine }}</td>
                     </tr>
+                    <tr v-if="todo.show_reason">
+                        <td colspan="2">处理时间: {{todo.finish_time}}</td>
+                    </tr>
+                    <tr v-if="todo.show_reason">
+                        <td colspan="2">出错原因: {{ todo.finish_reason }}</td>
+                    </tr>
                 </table>
             </td>
             <td>
@@ -255,14 +261,33 @@
                 ],
                 search_show_status: '-1',
                 category: [
-                    "Shovel Error",
-                    "Cookie Invalidated",
-                    "Target Resource Lost",
-                    "Third Service Error",
-                    "Account Not Permitted",
+                    // info
                     "Target Resource Null",
+
+                    // notice
                     "Resource Delay",
+                    "SMS Required",
+
+                    // warning
+                    "Cookie Invalidated",
+                    "Sliding Required",
                     "Target Resource Strange",
+
+                    // Error
+                    "BiDp Open Api Unreachable",
+                    "Leqee EE Open Api Error",
+                    "Shovel Error",
+                    "Shovel Not Found",
+                    "Elihu Open Api Unreachable",
+                    "Mizar Open Api Unreachable",
+                    "Third Service Error",
+                    "ETL Open Api Unreachable",
+
+                    // Fatal
+                    "Account Not Passable",
+                    "Account Not Permitted",
+                    "Target Resource Lost",
+
                 ],
                 all_checked: false,
                 finish_show: false,
@@ -277,6 +302,7 @@
         },
         mounted() {
             this.load_user();
+            this.load_category();
             this.query_data();
         },
         methods: {
@@ -293,6 +319,7 @@
                         this.res_todos = response.data;
                         this.transfer_todo();
                         this.save_user();
+                        this.save_category();
                     })
                     .catch(error => {
                         console.error('Error fetching todos:', error);
@@ -304,7 +331,8 @@
                 for (let i = 0; i < this.res_todos.length; i++) {
                     this.todos.push({
                         ...this.res_todos[i],
-                        is_ok: Boolean(this.res_todos[i].finish_time)
+                        is_ok: Boolean(this.res_todos[i].finish_time),
+                        show_reason: Boolean(this.res_todos[i].finish_time),
                     })
                 }
                 if (this.todos.length === 0) {
@@ -345,6 +373,17 @@
                     this.search_user = []
                 } else {
                     this.search_user = JSON.parse(local_user)
+                }
+            },
+            save_category(){
+                localStorage.setItem('local_category', JSON.stringify(this.search_category))
+            },
+            load_category(){
+                let local_user = localStorage.getItem("local_category")
+                if (local_user === null) {
+                    this.search_category = []
+                } else {
+                    this.search_category = JSON.parse(local_user)
                 }
             },
             candles_click() {
