@@ -128,7 +128,7 @@
         <tr v-for="todo in todos" :key="todo.id">
             <td>
                 <label style="display: inline-block; width: 100%; cursor: pointer;">
-                    <input type="checkbox" v-model="todo.is_ok">
+                    <input type="checkbox" v-model="todo.is_ok" @change="change_clipboard">
                 </label>
             </td>
             <td>
@@ -196,34 +196,41 @@
         </tbody>
     </table>
 
-    <div class="d-flex justify-content-start">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" v-model="all_checked" @click="toggle_all"/>
-            <label class="form-check-label">全选</label>
+    <div>
+        <div class="left-panel">
+            <div class="d-flex justify-content-start">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="all_checked" @click="toggle_all"/>
+                    <label class="form-check-label">全选</label>
+                </div>
+                <div style="width: 50px;"></div>
+                <div class="input-group mb-3" style="width: 400px;">
+                    <span class="input-group-text">出错原因</span>
+                    <input type="text" class="form-control" v-model="finish_reason" @input="change_clipboard"
+                           placeholder="包含「数据延迟」时, 可触发惊喜" @blur="copy_to_clipboard">
+                </div>
+                <div style="width: 50px;"></div>
+                <button type="button" class="btn btn-success" style="width: 150px; height: 40px;" @click="finish_data">
+                    已批
+                </button>
+            </div>
         </div>
-        <div style="width: 50px;"></div>
-        <div class="input-group mb-3" style="width: 400px;">
-            <span class="input-group-text">出错原因</span>
-            <input type="text" class="form-control" v-model="finish_reason">
+        <div class="right-panel">
+            <div v-if="clipboard_info !== ''">
+                <div class="card" style="width: 28rem;">
+                    <div class="card-header">
+                        点击空白处自动复制, 去发数据延迟通知吧
+                    </div>
+                    <div class="card-body">
+                        <div v-for="cinfo in clipboard_info_lst"> {{ cinfo }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div style="width: 50px;"></div>
-        <button type="button" class="btn btn-success" style="width: 150px; height: 40px;" @click="finish_data">已批</button>
-        <div style="width: 50px;"></div>
-        <div v-if="finish_show" class="alert alert-info">{{ finish_msg }}</div>
     </div>
 
 
-    <div style="width: 30px; height: 44px; position: absolute; right: 0; bottom: 0;" id="candles"
-         @click="candles_click">🕯
-    </div>
 </div>
-<!--<script>  // 蜡烛悬浮代码(好像有bug，先关闭)-->
-<!--window.onscroll = function () {-->
-<!--    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;-->
-<!--    var candles = document.getElementById('candles');-->
-<!--    candles.style.top = document.documentElement.clientHeight - candles.offsetHeight + scrollTop + 'px'-->
-<!--}-->
-<!--</script>-->
 <script type="module">
     const {createApp, ref} = Vue
     const loading = '正在加载数据, 请稍候  (￣o￣) . z Z'
@@ -292,7 +299,10 @@
                 all_checked: false,
                 finish_show: false,
                 finish_reason: '',
-                finish_msg: ''
+                finish_msg: '',
+
+                clipboard_info: '',
+                clipboard_info_lst: [],
             }
         },
         created() {
@@ -340,6 +350,7 @@
                     const empty = empty_lst[randomIndex];
                     this.todos.push({id: 1, shovel_project: empty, platform_code: empty, reason: empty})
                 }
+                this.res_todos = [];
             },
             toggle_all() {
                 this.all_checked = !this.all_checked;
@@ -364,6 +375,48 @@
                         alert(error);
                     });
             },
+            change_clipboard() {
+                if (this.finish_reason.includes("数据延迟")) {
+                    this.clipboard_info = '';
+                    this.clipboard_info_lst = [];
+                    this.todos.forEach((todo) => {
+                        if ((todo.finish_time === null || todo.finish_time === 'null') && todo.is_ok === true) {
+                            const tn = "表名: " + todo.table_names;
+                            const pi = "path id: " + todo.path_id;
+                            const rs = "原因: " + this.finish_reason;
+                            this.clipboard_info += "\n" + tn;
+                            this.clipboard_info_lst.push(tn);
+                            this.clipboard_info += "\n" + pi;
+                            this.clipboard_info_lst.push(pi);
+                            this.clipboard_info += "\n" + rs;
+                            this.clipboard_info_lst.push(rs);
+                            this.clipboard_info += "\n";
+                            this.clipboard_info_lst.push("----------------");
+                        }
+                    })
+                    if (this.clipboard_info === "") {
+                        this.clipboard_info = "请勾选报警信息";
+                        this.clipboard_info_lst = ["请勾选报警信息"];
+                        return
+                    }
+                    const tl = "【数据延迟通知】";
+                    this.clipboard_info = tl + this.clipboard_info;
+                    this.clipboard_info_lst.unshift(tl);
+
+                } else {
+                    this.clipboard_info = '';
+                }
+            },
+            copy_to_clipboard() {
+                if (this.clipboard_info !== '') {
+                    navigator.clipboard.writeText(this.clipboard_info).then(() => {
+                        console.log('文本已复制到剪贴板');
+                    }, (err) => {
+                        console.error('复制失败:', err);
+                    });
+                }
+
+            },
             save_user() {
                 localStorage.setItem('local_user', JSON.stringify(this.search_user))
             },
@@ -375,19 +428,16 @@
                     this.search_user = JSON.parse(local_user)
                 }
             },
-            save_category(){
+            save_category() {
                 localStorage.setItem('local_category', JSON.stringify(this.search_category))
             },
-            load_category(){
+            load_category() {
                 let local_user = localStorage.getItem("local_category")
                 if (local_user === null) {
                     this.search_category = []
                 } else {
                     this.search_category = JSON.parse(local_user)
                 }
-            },
-            candles_click() {
-                alert("墓室的东南角先点一根蜡烛")
             },
         }
     });
