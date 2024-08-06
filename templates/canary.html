@@ -107,11 +107,38 @@
             </form>
         </div>
         <div class="right-panel">
-            <!--            <div style="text-align: center">敬请期待 (oﾟvﾟ)ノ</div>-->
-            <div style="text-align: center">1911年，英国的矿工们开始把金丝雀带入矿井。</div>
-            <div style="text-align: center">这些小鸟对一氧化碳非常敏感，微量的一氧化碳泄露就会让它们焦躁、啼叫甚至死亡。
+            <div v-if="this.todos.length <= 1">
+                <!--            <div style="text-align: center">敬请期待 (oﾟvﾟ)ノ</div>-->
+                <div style="text-align: center">1911年，英国的矿工们开始把金丝雀带入矿井。</div>
+                <div style="text-align: center">这些小鸟对一氧化碳非常敏感，微量的一氧化碳泄露就会让它们焦躁、啼叫甚至死亡。
+                </div>
+                <div style="text-align: center">所以，一旦井下的金丝雀表现异样，矿工就得知危险来临，会迅速逃离矿井保命。
+                </div>
             </div>
-            <div style="text-align: center">所以，一旦井下的金丝雀表现异样，矿工就得知危险来临，会迅速逃离矿井保命。</div>
+            <div v-else>
+                <div style=" float: left">
+                    <div style="margin-left: 20px;margin-right: 20px;">
+                        <ul class="list-group">
+                            <li class="list-group-item" v-for="tgi in todos_group_task_id_info">{{ tgi }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="float: left">
+                    <div style="margin-left: 20px;margin-right: 20px;">
+                        <ul class="list-group">
+                            <li class="list-group-item" v-for="tgi in todos_group_account_name_info">{{ tgi }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="float: left">
+                    <div style="margin-left: 20px;margin-right: 20px;">
+                        <ul class="list-group">
+                            <li class="list-group-item" v-for="tgi in todos_group_category_info">{{ tgi }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -207,7 +234,7 @@
                 <div class="input-group mb-3" style="width: 400px;">
                     <span class="input-group-text">出错原因</span>
                     <input type="text" class="form-control" v-model="finish_reason" @input="change_clipboard"
-                           placeholder="包含「数据延迟」时, 可触发惊喜" @blur="copy_to_clipboard">
+                           placeholder="包含「数据延迟」,「下线」时, 可触发惊喜" @blur="copy_to_clipboard">
                 </div>
                 <div style="width: 50px;"></div>
                 <button type="button" class="btn btn-success" style="width: 150px; height: 40px;" @click="finish_data">
@@ -219,7 +246,7 @@
             <div v-if="clipboard_info !== ''">
                 <div class="card" style="width: 28rem;">
                     <div class="card-header">
-                        点击空白处自动复制, 去发数据延迟通知吧
+                        点击空白处自动复制, 去发通知吧
                     </div>
                     <div class="card-body">
                         <div v-for="cinfo in clipboard_info_lst"> {{ cinfo }}</div>
@@ -249,6 +276,9 @@
                 todos: [  // 页面展示数据
                     {id: 1, shovel_project: loading, platform_code: loading, reason: loading},
                 ],
+                todos_group_account_name_info: [], // 账号分组
+                todos_group_task_id_info: [],  // 任务id分组
+                todos_group_category_info: [],  // 类别分组
                 search_user: [],
                 user: [
                     "qhpeng", "zhchen8", "hchen23", "gfzhou",
@@ -351,6 +381,62 @@
                     this.todos.push({id: 1, shovel_project: empty, platform_code: empty, reason: empty})
                 }
                 this.res_todos = [];
+                // 转化聚合todos
+                this.todos_group_account_name_info = [];
+                this.todos_group_account_name_info.push("账号分组: ")
+                this.todos_group_task_id_info = [];
+                this.todos_group_task_id_info.push("task总数量: " + this.todos.length)
+                this.todos_group_category_info = [];
+                this.todos_group_category_info.push("类别分组: ")
+
+                // 统计 account_name task_id category 每种的数量
+                const account_name_cnt = {};
+                const task_id_cnt = {};
+                const category_cnt = {};
+                this.todos.forEach(item => {
+                    if (account_name_cnt[item.account_name]) {
+                        account_name_cnt[item.account_name]++;
+                    } else {
+                        account_name_cnt[item.account_name] = 1;
+                    }
+                    if (task_id_cnt[item.task_id]) {
+                        task_id_cnt[item.task_id]++;
+                    } else {
+                        task_id_cnt[item.task_id] = 1;
+                    }
+                    if (category_cnt[item.category]) {
+                        category_cnt[item.category]++;
+                    } else {
+                        category_cnt[item.category] = 1;
+                    }
+                });
+                const show_num = 3;
+                Object.entries(account_name_cnt).some(([key, value], index) => {
+                    if (index < show_num) {
+                        this.todos_group_account_name_info.push(String(key) + ": " + String(value))
+                    }else{
+                        this.todos_group_account_name_info.push("⚠展示不下了 o(TヘTo)")
+                        return true;
+                    }
+                })
+                Object.entries(task_id_cnt).some(([key, value], index) => {
+                    if (index < show_num) {
+                        this.todos_group_task_id_info.push(String(key) + ": " + String(value))
+                    }else{
+                        this.todos_group_task_id_info.push("⚠展示不下了 ≧ ﹏ ≦")
+                        return true;
+                    }
+                })
+                Object.entries(category_cnt).some(([key, value], index) => {
+                    if (index < show_num) {
+                        this.todos_group_category_info.push(String(key) + ": " + String(value))
+                    }else{
+                        this.todos_group_category_info.push("⚠展示不下了 /(ㄒoㄒ)/~~")
+                        return true;
+                    }
+                })
+
+
             },
             toggle_all() {
                 this.all_checked = !this.all_checked;
@@ -376,7 +462,7 @@
                     });
             },
             change_clipboard() {
-                if (this.finish_reason.includes("数据延迟")) {
+                if (this.finish_reason.includes("数据延迟") || this.finish_reason.includes("下线")) {
                     this.clipboard_info = '';
                     this.clipboard_info_lst = [];
                     this.todos.forEach((todo) => {
