@@ -333,6 +333,7 @@
 
                 clipboard_info: '',
                 clipboard_info_lst: [],
+                clipboard_info_set: new Set(),
             }
         },
         created() {
@@ -414,7 +415,7 @@
                 Object.entries(account_name_cnt).some(([key, value], index) => {
                     if (index < show_num) {
                         this.todos_group_account_name_info.push(String(key) + ": " + String(value))
-                    }else{
+                    } else {
                         this.todos_group_account_name_info.push("⚠展示不下了 o(TヘTo)")
                         return true;
                     }
@@ -422,7 +423,7 @@
                 Object.entries(task_id_cnt).some(([key, value], index) => {
                     if (index < show_num) {
                         this.todos_group_task_id_info.push(String(key) + ": " + String(value))
-                    }else{
+                    } else {
                         this.todos_group_task_id_info.push("⚠展示不下了 ≧ ﹏ ≦")
                         return true;
                     }
@@ -430,7 +431,7 @@
                 Object.entries(category_cnt).some(([key, value], index) => {
                     if (index < show_num) {
                         this.todos_group_category_info.push(String(key) + ": " + String(value))
-                    }else{
+                    } else {
                         this.todos_group_category_info.push("⚠展示不下了 /(ㄒoㄒ)/~~")
                         return true;
                     }
@@ -441,6 +442,7 @@
             toggle_all() {
                 this.all_checked = !this.all_checked;
                 this.todos.forEach((todo) => (todo.is_ok = this.all_checked));
+                this.change_clipboard();
             },
             finish_data() {
                 const send_data = [];
@@ -465,19 +467,24 @@
                 if (this.finish_reason.includes("数据延迟") || this.finish_reason.includes("下线")) {
                     this.clipboard_info = '';
                     this.clipboard_info_lst = [];
+                    this.clipboard_info_set = new Set();
                     this.todos.forEach((todo) => {
                         if ((todo.finish_time === null || todo.finish_time === 'null') && todo.is_ok === true) {
                             const tn = "表名: " + todo.table_names;
                             const pi = "path id: " + todo.path_id;
                             const rs = "原因: " + this.finish_reason;
-                            this.clipboard_info += "\n" + tn;
-                            this.clipboard_info_lst.push(tn);
-                            this.clipboard_info += "\n" + pi;
-                            this.clipboard_info_lst.push(pi);
-                            this.clipboard_info += "\n" + rs;
-                            this.clipboard_info_lst.push(rs);
-                            this.clipboard_info += "\n";
-                            this.clipboard_info_lst.push("----------------");
+                            const tn_pi = tn + pi
+                            if (!this.clipboard_info_set.has(tn_pi)) {
+                                this.clipboard_info += "\n" + tn;
+                                this.clipboard_info_lst.push(tn);
+                                this.clipboard_info += "\n" + pi;
+                                this.clipboard_info_lst.push(pi);
+                                this.clipboard_info += "\n" + rs;
+                                this.clipboard_info_lst.push(rs);
+                                this.clipboard_info += "\n";
+                                this.clipboard_info_lst.push("----------------");
+                                this.clipboard_info_set.add(tn_pi)
+                            }
                         }
                     })
                     if (this.clipboard_info === "") {
@@ -494,7 +501,7 @@
                 }
             },
             copy_to_clipboard() {
-                if (this.clipboard_info !== '') {
+                if (this.clipboard_info !== '' || this.clipboard_info !== '请勾选报警信息') {
                     navigator.clipboard.writeText(this.clipboard_info).then(() => {
                         console.log('文本已复制到剪贴板');
                     }, (err) => {
