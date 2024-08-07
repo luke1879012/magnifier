@@ -457,6 +457,7 @@
                         this.query_data();
                         this.all_checked = false;
                         this.finish_reason = '';
+                        this.change_clipboard();
                     })
                     .catch(error => {
                         console.error('Error fetching todos:', error);
