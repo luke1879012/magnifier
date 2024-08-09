@@ -18,11 +18,11 @@ app.static("/g.ini", "./direct_file/g.ini", name="g_ini")
 app.static("/", "./templates/index.html", name="index")
 app.static("/static", "./static", name="static_data")
 app.static("/bar_test", "./templates/bar_test.html", name="bar_test")
-app.static("/slide", "./templates/slide.html", name="slide")
-app.static("/login_status", "./templates/slide.html", name="login_status")
-app.static("/sche", "./templates/sche_run.html", name="sche")
+# app.static("/slide", "./templates/slide.html", name="slide")
+# app.static("/login_status", "./templates/slide.html", name="login_status")
+# app.static("/sche", "./templates/sche_run.html", name="sche")
 # 报警系统
-app.static("/canary", "./templates/canary.html", name="canary")
+# app.static("/canary", "./templates/canary.html", name="canary")
 app.static("/test", "./templates/test.html", name="test")
 
 
