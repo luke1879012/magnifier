@@ -473,15 +473,12 @@
                         if ((todo.finish_time === null || todo.finish_time === 'null') && todo.is_ok === true) {
                             const tn = "表名: " + todo.table_names;
                             const pi = "path id: " + todo.path_id;
-                            const rs = "原因: " + this.finish_reason;
                             const tn_pi = tn + pi
                             if (!this.clipboard_info_set.has(tn_pi)) {
                                 this.clipboard_info += "\n" + tn;
                                 this.clipboard_info_lst.push(tn);
                                 this.clipboard_info += "\n" + pi;
                                 this.clipboard_info_lst.push(pi);
-                                this.clipboard_info += "\n" + rs;
-                                this.clipboard_info_lst.push(rs);
                                 this.clipboard_info += "\n";
                                 this.clipboard_info_lst.push("----------------");
                                 this.clipboard_info_set.add(tn_pi)
@@ -493,6 +490,11 @@
                         // this.clipboard_info_lst = ["请勾选报警信息"];
                         return
                     }
+
+                    const rs = "原因: " + this.finish_reason;
+                    this.clipboard_info += "\n" + rs;
+                    this.clipboard_info_lst.push(rs);
+
                     const tl = "【数据延迟通知】";
                     this.clipboard_info = tl + this.clipboard_info;
                     this.clipboard_info_lst.unshift(tl);
