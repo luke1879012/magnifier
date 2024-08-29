@@ -21,8 +21,12 @@ def login_status():
 
     stage_names = [
         '天猫', '生意', '店小蜜', '赤兔', "谛听",
-        '零售通', '京东',
-        '抖店', '罗盘', '飞鸽', '千川', '抖店2', '抖店cg',
+        # '零售通',
+        '京东',
+        '抖店', '罗盘',
+        # '飞鸽',
+        '千川', '抖店2', '抖店cg',
+        '京情', '淘情',
     ]
     values = [0 for _ in range(len(stage_names))]
     values_ns = [0 for _ in range(len(stage_names))]
