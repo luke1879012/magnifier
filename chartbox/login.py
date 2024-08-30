@@ -24,9 +24,9 @@ def login_status():
         # '零售通',
         '京东',
         '抖店', '罗盘',
-        # '飞鸽',
-        '千川', '抖店2', '抖店cg',
-        '京情', '淘情',
+        # '飞鸽', '千川',
+        '抖店2', '抖店cg',
+        '京情', '淘情', '淘菜菜'
     ]
     values = [0 for _ in range(len(stage_names))]
     values_ns = [0 for _ in range(len(stage_names))]
