@@ -338,7 +338,7 @@
         },
         created() {
             const start_time = new Date();
-            start_time.setDate(start_time.getDate() - 1);
+            start_time.setDate(start_time.getDate() - 3);
             this.search_start_time = start_time.toISOString().slice(0, 10) + ' 00:00:00'; // 转换为'YYYY-MM-DD'格式的字符串
         },
         mounted() {
