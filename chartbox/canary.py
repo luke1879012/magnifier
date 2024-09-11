@@ -27,7 +27,10 @@ def get_err_msg(msg):
 def canary_query(data):
     print(f"canary_query {data=}")
     max_query_num = 4000
-    fields = ["start_time", "end_time", "task_id", "category", "is_ok", "search_user"]
+    fields = [
+        "start_time", "end_time", "task_id", "category", "is_ok", "search_user",
+        "search_shovel_name", "search_account_name",
+    ]
 
     query_params = {}
     if not data:
@@ -69,6 +72,14 @@ def canary_query(data):
         elif is_ok == '-1':
             where_list.append("finish_time is null")
 
+    if search_shovel_name := query_params.get("search_shovel_name"):
+        where_list.append("shovel_name = %s")
+        where_value.append(search_shovel_name)
+
+    if search_account_name := query_params.get("search_account_name"):
+        where_list.append("account_name like %s")
+        where_value.append(search_account_name + "%")
+
     where_str = " and ".join(where_list)
     db = get_db("l_test")
 
@@ -103,6 +114,9 @@ def canary_finish(data):
     done_lst = []
     ing_lst = []
     for data in send_data:
+        if str(data['id']) == "-1":
+            return []
+
         if data['is_ok']:  # 勾选完成
             if data['finish_time']:  # 有结束时间
                 pass  # 以前就完成了，跳过

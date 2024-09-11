@@ -94,13 +94,18 @@
                 </div>
 
                 <div class="input-group mb-3">
-                    <div>
+                    <div style="margin-right: 2px;">
                         <select class="selectpicker" v-model="search_show_status">
                             <option v-for="ss in show_status" :value="ss.value">
                                 {{ ss.label }}
                             </option>
                         </select>
                     </div>
+                    <span class="input-group-text">shovel_name</span>
+                    <input type="text" class="form-control" v-model="search_shovel_name"
+                           required>
+                    <span class="input-group-text">account_name</span>
+                    <input type="text" class="form-control" placeholder="account_name%" v-model="search_account_name">
                 </div>
 
 
@@ -274,7 +279,7 @@
             return {
                 res_todos: [],  // 查询响应数据
                 todos: [  // 页面展示数据
-                    {id: 1, shovel_project: loading, platform_code: loading, reason: loading},
+                    {id: -1, shovel_project: loading, platform_code: loading, reason: loading},
                 ],
                 todos_group_account_name_info: [], // 账号分组
                 todos_group_task_id_info: [],  // 任务id分组
@@ -297,6 +302,8 @@
                     {value: '-1', label: 'only 🔲'},
                 ],
                 search_show_status: '-1',
+                search_shovel_name: '',
+                search_account_name: '',
                 category: [
                     // info
                     "Target Resource Null",
@@ -355,6 +362,8 @@
                     category: this.search_category,
                     is_ok: this.search_show_status,
                     search_user: this.search_user,
+                    search_shovel_name: this.search_shovel_name,
+                    search_account_name: this.search_account_name,
                 }, {headers: {'Content-Type': 'application/json'}})
                     .then(response => {
                         this.res_todos = response.data;
@@ -379,7 +388,7 @@
                 if (this.todos.length === 0) {
                     const randomIndex = Math.floor(Math.random() * empty_lst.length);
                     const empty = empty_lst[randomIndex];
-                    this.todos.push({id: 1, shovel_project: empty, platform_code: empty, reason: empty})
+                    this.todos.push({id: -1, shovel_project: empty, platform_code: empty, reason: empty})
                 }
                 this.res_todos = [];
                 // 转化聚合todos
