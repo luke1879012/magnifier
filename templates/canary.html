@@ -474,6 +474,7 @@
                     });
             },
             change_clipboard() {
+                let tl;
                 if (this.finish_reason.includes("数据延迟") || this.finish_reason.includes("下线")) {
                     this.clipboard_info = '';
                     this.clipboard_info_lst = [];
@@ -504,7 +505,13 @@
                     this.clipboard_info += "\n" + rs;
                     this.clipboard_info_lst.push(rs);
 
-                    const tl = "【数据延迟通知】";
+
+                    if (this.finish_reason.includes("数据延迟")){
+                        tl = "【数据延迟通知】";
+                    }else{
+                        tl = "【下线通知】";
+                    }
+
                     this.clipboard_info = tl + this.clipboard_info;
                     this.clipboard_info_lst.unshift(tl);
 
