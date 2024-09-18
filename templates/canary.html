@@ -170,13 +170,18 @@
                         <td>{{ todo.shovel_name }}</td>
                     </tr>
                     <tr>
-                        <td>path_id: {{ todo.path_id }}</td>
+                        <td :style="{'background-color': todo.level === 0 ? '#ed544a' : todo.level === 1 ? '#fcbc4c' : 'transparent'}">
+                            path_id: {{ todo.path_id }}{{ show_level(todo.level) }}
+                        </td>
                         <td>
                             <div :title="todo.target_page">{{ todo.target_page }}</div>
                         </td>
                     </tr>
                     <tr>
-                        <td>task_id: {{ todo.task_id }}</td>
+                        <td>
+                            <button type="button" class="btn btn-light" @click="get_task_log(todo.task_id)">task_id: </button>
+                            {{ todo.task_id }}
+                        </td>
                         <td>machine: {{ todo.machine }}</td>
                     </tr>
                     <tr v-if="todo.show_reason">
@@ -506,9 +511,9 @@
                     this.clipboard_info_lst.push(rs);
 
 
-                    if (this.finish_reason.includes("数据延迟")){
+                    if (this.finish_reason.includes("数据延迟")) {
                         tl = "【数据延迟通知】";
-                    }else{
+                    } else {
                         tl = "【下线通知】";
                     }
 
@@ -550,6 +555,30 @@
                 } else {
                     this.search_category = JSON.parse(local_user)
                 }
+            },
+            show_level(level) {
+                if (level === 0 || level === 1 || level === 2 || level === 3) {
+                    return '(P' + level + ')'
+                }
+            },
+            get_task_log(task_id) {
+                if (!task_id){
+                    return
+                }
+                axios.post('/api_get_task_log', {
+                    task_id: task_id,
+                }, {headers: {'Content-Type': 'application/json'}})
+                    .then(response => {
+                        const log_data = response.data;
+                        // 'log_of_shovel_task'
+                        // 'log_of_loop_task'
+                        // 'log_of_loop_task_pipe'
+                        window.open(log_data['log_of_shovel_task'].replace('use_highlight=YES', ''), '_blank');
+                    })
+                    .catch(error => {
+                        console.error('Error get_task_log:', error);
+                        alert(error);
+                    });
             },
         }
     });

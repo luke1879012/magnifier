@@ -14,6 +14,44 @@ from pymysql.cursors import DictCursor
 
 from utils.database import get_db
 
+# 大促xlsx
+KEY_DATA = [None]
+
+
+def get_key_data():
+    """获取大促优先级表格"""
+    key_data = KEY_DATA[0]
+    if key_data:
+        return key_data
+
+    import pandas as pd
+    df = pd.read_excel(r'E:\github_code\magnifier\test\24年双11重点保障数据集-清单确认(终版).xlsx',
+                       sheet_name="24年双11大促_重点保障数据集对应采集表(终版)")
+    df2 = df[df['路径id'].notna()]
+    df3 = df2[['路径id', '数据集等级', '采集表']]
+    df3.fillna('', inplace=True)
+    path_id2level = {}
+    for idx, row in df3.iterrows():
+        # print(row)
+        table_name = row['采集表']
+        path_id = row['路径id']
+        if isinstance(path_id, str) and not path_id.isdigit():
+            continue
+        sell_level_str = row['数据集等级']
+        if 'P0' in sell_level_str:
+            sell_level = 0
+        elif 'P1' in sell_level_str:
+            sell_level = 1
+        elif 'P2' in sell_level_str:
+            sell_level = 2
+        elif 'P3' in sell_level_str:
+            sell_level = 3
+        else:
+            sell_level = None
+        path_id2level[path_id] = sell_level
+    KEY_DATA[0] = path_id2level
+    return path_id2level
+
 
 def get_err_msg(msg):
     return [{
@@ -90,12 +128,14 @@ def canary_query(data):
         cursor.execute(sql_str, where_value)
         c_data = cursor.fetchall()
         # print(c_data)
+    path_id2level = get_key_data()
     ret_data = []
     for row in c_data:
         copy_row = copy.deepcopy(row)
         for k, v in copy_row.items():
             if isinstance(v, datetime):
                 copy_row[k] = v.strftime("%Y-%m-%d %H:%M:%S")
+        copy_row["level"] = path_id2level.get(int(copy_row['path_id']))
         ret_data.append(copy_row)
 
     if len(ret_data) >= max_query_num:
@@ -114,7 +154,7 @@ def canary_finish(data):
     done_lst = []
     ing_lst = []
     for data in send_data:
-        if str(data['id']) == "-1":
+        if int(data['id']) < 0:
             return []
 
         if data['is_ok']:  # 勾选完成
@@ -147,3 +187,15 @@ def canary_finish(data):
             db.commit()
 
     return []
+
+
+if __name__ == '__main__':
+    from pprint import pprint
+
+    query_data = {'task_id': '', 'start_time': '2024-09-10 00:00:00', 'end_time': '',
+                  'category': ['Cookie Invalidated', 'Sliding Required', 'BiDp Open Api Unreachable',
+                               'Leqee EE Open Api Error', 'Shovel Error', 'Shovel Not Found',
+                               'Elihu Open Api Unreachable', 'Third Service Error', 'Target Resource Lost'],
+                  'is_ok': '1', 'search_user': ['zhchen8'], 'search_shovel_name': 'EvaluateListDailyShovel', 'search_account_name': ''}
+    result_data = canary_query(query_data)
+    pprint(result_data)

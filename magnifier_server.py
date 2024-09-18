@@ -1,3 +1,5 @@
+from hertz_packet.notice import get_kv
+from lqbox.elihu import ElihuBox
 from sanic import Sanic
 from sanic.response import json
 
@@ -83,6 +85,24 @@ async def api_canary_finish(request):
     return json(ret_data)
 
 
+@app.route("/api_get_task_log", methods=["POST"])
+async def api_get_task_log(request):
+    data = request.json
+    task_id = data.get("task_id")
+    if task_id is None:
+        return json({"error": "No task id"})
+    elihu_cookie_msg = get_kv('zhchen_elihu_cookie_dict')
+    elihu = ElihuBox(elihu_cookie_msg['memo'])
+    json_data = {
+        'page': 1,
+        'page_size': 10,
+        'status': ['INIT', 'ENQUEUED', 'RUNNING', 'DONE', 'ERROR', 'DEAD', 'CANCELLED'],
+        'task_id': task_id,
+    }
+    search_res = elihu.queue_search(json_data)
+    task_info = search_res.json()['data']['tasks'][0]
+    ret_data = task_info['log_url_dict']
+    return json(ret_data)
 
 if __name__ == '__main__':
     # mf

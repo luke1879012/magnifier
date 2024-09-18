@@ -1,3 +1,7 @@
 pyecharts==2.0.4
 Sanic==23.6.0
 PyMySQL==1.1.0
+pandas==2.0.3
+openpyxl==3.1.5
+lqbox==2.14.0
+hertz-packet==2.6.0
