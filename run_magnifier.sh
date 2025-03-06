@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 定义日志文件路径
-LOG_FILE="/var/log/magnifier_startup.log"
+LOG_FILE="/home/ubuntu/code/magnifier/magnifier_startup.log"
 
 # 记录启动时间
 echo "Starting Magnifier Service at $(date)" >> $LOG_FILE
