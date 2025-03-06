@@ -7,7 +7,7 @@ LOG_FILE="/var/log/magnifier_startup.log"
 echo "Starting Magnifier Service at $(date)" >> $LOG_FILE
 
 # 切换到项目目录
-cd ~/code/magnifier/ || { echo "Failed to enter project directory" >> $LOG_FILE; exit 1; }
+cd /home/ubuntu/code/magnifier/ || { echo "Failed to enter project directory" >> $LOG_FILE; exit 1; }
 
 # 激活虚拟环境
 source venv/bin/activate || { echo "Failed to activate virtual environment" >> $LOG_FILE; exit 1; }
